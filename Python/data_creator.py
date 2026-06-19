@@ -2,10 +2,17 @@ import sqlite3
 import yaml
 import csv
 from pathlib import Path
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(BASE_DIR, '..'))
+
 from Server.Flask.config_manager import get_config
+
 # YAML laden
 yaml_file = get_config()
-with open(fr"../Server/Datenbanken/{yaml_file}", "r", encoding="utf-8") as file:
+yaml_path = os.path.join(BASE_DIR, "..", "Server", "Datenbanken", yaml_file)
+with open(yaml_path, "r", encoding="utf-8") as file:
     config = yaml.safe_load(file)
 
 total_mails = config["send"]["total_emails"]
@@ -13,7 +20,7 @@ total_mails = config["send"]["total_emails"]
 
 def create_connection():
     #Ordner festlegen
-    folder = Path("databases")
+    folder = Path(os.path.join(BASE_DIR, "databases"))
     #erstellen, falls er noch nicht existiert
     folder.mkdir(exist_ok=True)
     #Zähler starten
@@ -82,7 +89,8 @@ def user_erlaubt(row):
 
     return True
 
-with open(r"../Server/Datenbanken/current_user_list.csv", newline="", encoding="utf-8") as f:
+csv_path = os.path.join(BASE_DIR, "..", "Server", "Datenbanken", "current_user_list.csv")
+with open(csv_path, newline="", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     empfaenger = [row for row in reader if user_erlaubt(row)]
 

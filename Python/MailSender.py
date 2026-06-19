@@ -9,9 +9,15 @@ import time
 from datetime import datetime, timedelta
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import sys
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(BASE_DIR, '..'))
+
 from Server.Flask.config_manager import get_config
 yaml_file = get_config()
-with open(f"../Server/Datenbanken/{yaml_file}", "r", encoding="utf-8") as file:
+yaml_path = os.path.join(BASE_DIR, "..", "Server", "Datenbanken", yaml_file)
+with open(yaml_path, "r", encoding="utf-8") as file:
     config_cpgn = yaml.safe_load(file)
 id = 0
 # Absender-Infos
@@ -75,9 +81,10 @@ def daily_job():
 chosen_mail_body = "placeholder"
 def declareMailBody(dateiname):
     # Dateipfad zusammensetzen
-    mail_body_pfad = os.path.join(r"../Server/Mails", dateiname)
-    list_mail_bodys = [f for f in os.listdir(r"../Server/Mails") if os.path.isfile(os.path.join(r"../Server/Mails", f))]
-    with open(fr"../Server/Mails/{dateiname}", "r", encoding="utf-8") as file:
+    mails_dir = os.path.join(BASE_DIR, "..", "Server", "Mails")
+    mail_body_pfad = os.path.join(mails_dir, dateiname)
+    list_mail_bodys = [f for f in os.listdir(mails_dir) if os.path.isfile(os.path.join(mails_dir, f))]
+    with open(mail_body_pfad, "r", encoding="utf-8") as file:
         mail_body = file.read()
     return mail_body
 def send_mail(anzahl, waiting_time):
@@ -86,7 +93,8 @@ def send_mail(anzahl, waiting_time):
     for i in range(anzahl):
         global id
         id += 1
-        with open(r"../Server/Datenbanken/current_user_list.csv", newline="", encoding="utf-8") as f:
+        csv_path = os.path.join(BASE_DIR, "..", "Server", "Datenbanken", "current_user_list.csv")
+        with open(csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
 
             # SMTP-Verbindung einmal öffnen
